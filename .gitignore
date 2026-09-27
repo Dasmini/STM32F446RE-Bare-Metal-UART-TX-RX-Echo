@@ -1,0 +1,11 @@
+# Build artifacts
+*.elf
+*.bin
+*.o
+*.hex
+*.map
+
+# Editor/OS junk
+.vscode/
+*.swp
+.DS_Store
