@@ -1,13 +1,13 @@
 # STM32F446RE Bare-Metal UART TX + RX Echo
 
 A bare-metal firmware project that implements UART transmit and receive on
-an STM32 Nucleo-F446RE using **direct register writes only** — no HAL, no
+an STM32 Nucleo-F446RE using **direct register writes only** no HAL, no
 CubeMX, no standard library.
 
 ## What it does
 
 The STM32 receives characters typed into a PC serial terminal over
-USART2, and echoes each one straight back — proving a full TX + RX round
+USART2, and echoes each one straight back proving a full TX + RX round
 trip implemented entirely at the register level.
 
 ```
@@ -19,7 +19,7 @@ PC types 'A' → USART2 RX (PA3) → STM32 reads it → USART2 TX (PA2) → PC t
 - **Board:** STM32 Nucleo-F446RE
 - **MCU:** STM32F446RE (ARM Cortex-M4)
 - **UART peripheral:** USART2
-- **Pins:** PA2 (TX), PA3 (RX) — routed through the ST-Link's virtual COM
+- **Pins:** PA2 (TX), PA3 (RX) routed through the ST-Link's virtual COM
   port, so no external wiring or USB-to-TTL adapter is needed
 
 ## What gets configured
@@ -67,9 +67,9 @@ Addresses were found in the STM32F446 reference manual (RM0390):
 
 ## Toolchain
 
-- `arm-none-eabi-gcc` / `arm-none-eabi-objcopy` — compile and convert to
+- `arm-none-eabi-gcc` / `arm-none-eabi-objcopy`- compile and convert to
   raw binary
-- `st-flash` (from `stlink-tools`) — flash over ST-Link
+- `st-flash` (from `stlink-tools`) - flash over ST-Link
 
 ```bash
 sudo apt install gcc-arm-none-eabi stlink-tools
@@ -103,7 +103,7 @@ Connect a serial terminal at 9600 baud:
 sudo screen /dev/ttyACM0 9600
 ```
 
-Type a character — the STM32 receives it over RX and sends it back over
+Type a character, the STM32 receives it over RX and sends it back over
 TX, so it appears once on screen (`screen` does not locally echo
 keystrokes by default, so what you see is the board's echo, confirming
 the full round trip).
@@ -112,19 +112,19 @@ To exit `screen`: `Ctrl+A` then `K`, then `Y` to confirm.
 
 ## Key concepts
 
-- **Peripheral clocks are independent** — GPIOA and USART2 each need
+- **Peripheral clocks are independent** : GPIOA and USART2 each need
   their own clock enabled via `RCC` before their registers do anything;
   missing either one causes silent failure (writes appear to succeed but
   have no effect).
-- **Alternate function mode** — a GPIO pin only comes under a
+- **Alternate function mode** : a GPIO pin only comes under a
   peripheral's control once its `MODER` bits are set to `10` *and* the
   correct AF number is selected in `AFRL`/`AFRH`.
 - **Clear-then-set** for multi-bit fields (`MODER`, `AFRL`) to avoid
   leaving stale bits from the reset state.
-- **Status-flag polling** — both TX (`TXE`) and RX (`RXNE`) are
+- **Status-flag polling** : both TX (`TXE`) and RX (`RXNE`) are
   implemented as blocking polling loops: wait for the flag, then
   access the data register. This is the simplest form of UART I/O,
   with no interrupts or DMA involved.
-- **Baud rate register (`BRR`)** — holds a mantissa/fraction pair
+- **Baud rate register (`BRR`)** : holds a mantissa/fraction pair
   derived from the peripheral clock and target baud rate, not the baud
   rate itself.
